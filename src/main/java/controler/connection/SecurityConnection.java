@@ -1,42 +1,63 @@
 package controler.connection;
 
+import io.socket.emitter.Emitter;
+import model.message.MessageAskKey;
+import model.message.MessageJsonSocket;
+import model.message.MessageSendKey;
+import model.message.MessageType;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import sun.security.rsa.RSAKeyPairGenerator;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import java.io.UnsupportedEncodingException;
-import java.security.*;
+import javax.crypto.*;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 public class SecurityConnection {
 
-    private static KeyPair keyClient;
     private static PublicKey keyPubServ;
-    private static SecurityConnection instance = null;
+    private static SecretKey keySymetric;
 
-    public static SecurityConnection getInstance(){
-        if (instance == null)
-            instance = new SecurityConnection();
-        return instance;
+
+
+    public SecurityConnection() {
+        try {
+            KeyGenerator generator = KeyGenerator.getInstance("AES");
+            generator.init(128);
+            keySymetric = generator.generateKey();
+            System.out.println("Clé symétrique: "+new String(Base64.getEncoder().encode(keySymetric.getEncoded())));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
     }
 
-    private SecurityConnection() {
-        RSAKeyPairGenerator rsaKeyPairGenerator = new RSAKeyPairGenerator();
-        rsaKeyPairGenerator.initialize(2048, new SecureRandom());
-        keyClient = rsaKeyPairGenerator.generateKeyPair();
+    public void securiseSocket(SocketIO socket){
+        MessageAskKey keyAsk = new MessageAskKey();
+        socket.emit(MessageType.KEY_ASK, keyAsk);
+        socket.once(MessageType.KEY_RECEIVE, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                try {
+                    setSecureServKey(new JSONObject((String)args[0]));
+                    MessageSendKey keySend = new MessageSendKey();
+                    socket.emit(MessageType.KEY_SEND, keySend);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
-    public void setSecureServKey(JSONObject keyPub){
+    private void setSecureServKey(JSONObject keyPub){
         try {
             String key = keyPub.getString("key");
             key = key.replaceAll("(-+BEGIN PUBLIC KEY-+\\s?\\n|-+END PUBLIC KEY-+|\\n)","");
-            System.out.printf(key);
+            System.out.println("clé pub serveur = "+key);
             byte[] rsaKey = Base64.getDecoder().decode(key);
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(rsaKey);
             KeyFactory factory = KeyFactory.getInstance("RSA");
@@ -47,14 +68,23 @@ public class SecurityConnection {
     }
 
     public String encryptMessage(String message){
-        Cipher cipher = null;
         try {
-            cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-1AndMGF1Padding");
+            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
             cipher.init(Cipher.ENCRYPT_MODE, keyPubServ);
-            return new String(cipher.doFinal(message.getBytes("utf-8")));
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | BadPaddingException | UnsupportedEncodingException | IllegalBlockSizeException e) {
+            byte[] kbyte = cipher.doFinal(keySymetric.getEncoded());
+            String a = new String(kbyte);
+            String temp = "";
+            JSONArray array = new JSONArray(kbyte);
+            JSONObject object = new JSONObject();
+            object.put("tab", array);
+            return object.toString();
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException | JSONException e) {
             e.printStackTrace();
         }
         return "";
+    }
+
+    public boolean isComplete(){
+        return keySymetric != null && keyPubServ != null;
     }
 }
