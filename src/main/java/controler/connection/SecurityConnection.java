@@ -1,9 +1,8 @@
 package controler.connection;
 
 import io.socket.emitter.Emitter;
-import model.message.MessageAskKey;
-import model.message.MessageJsonSocket;
-import model.message.MessageSendKey;
+import model.message.send.MessageAskKey;
+import model.message.send.MessageSendKey;
 import model.message.MessageType;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,7 +38,7 @@ public class SecurityConnection {
     public void securiseSocket(SocketIO socket){
         MessageAskKey keyAsk = new MessageAskKey();
         socket.emit(MessageType.KEY_ASK, keyAsk);
-        socket.once(MessageType.KEY_RECEIVE, new Emitter.Listener() {
+        socket.once(MessageType.KEY_RECEIVE.getEvent(), new Emitter.Listener() {
             @Override
             public void call(Object... args) {
                 try {

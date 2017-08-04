@@ -1,8 +1,31 @@
 package model.message;
 
-public abstract class MessageType {
+public enum  MessageType {
+    KEY_ASK("key_ask", 1),
+    KEY_RECEIVE("key_re", 2),
+    KEY_SEND("key_se", 1),
+    NOTIF("notif", 2),
+    NOTIF_CALLBACK("notif_return", 0),
+    NOTIF_REPLY("notif_a", 1);
 
-    public static final String KEY_ASK = "key_ask";
-    public static final String KEY_RECEIVE = "key_re";
-    public static final String KEY_SEND = "key_se";
+    private String event;
+
+    /**
+     * 1 message send
+     * 2 message receive
+     */
+    private int cat;
+
+    MessageType(String event, int category) {
+        this.event = event;
+        this.cat = category;
+    }
+
+    public String getEvent(){
+        return event;
+    }
+
+    public int getCategory(){
+        return cat;
+    }
 }
