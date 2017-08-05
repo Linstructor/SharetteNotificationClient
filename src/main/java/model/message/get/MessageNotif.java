@@ -1,7 +1,6 @@
 package model.message.get;
 
 import model.message.MessageJsonSocket;
-import org.json.JSONObject;
 
 public abstract class MessageNotif extends MessageJsonSocket{
 
@@ -16,7 +15,7 @@ public abstract class MessageNotif extends MessageJsonSocket{
     }
 
     @Override
-    public JSONObject createJSON() {
+    public String createJSON() {
         return null;
     }
 }

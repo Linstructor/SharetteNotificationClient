@@ -12,10 +12,11 @@ import java.net.URISyntaxException;
 
 public class SocketIO {
 
+    //TODO manage timeout
+
     private Socket socket;
     private static SocketIO instance = null;
     private SecurityConnection securityConnection;
-    private History history;
 
     public static SocketIO getInstance() {
         if (instance == null){
@@ -48,12 +49,10 @@ public class SocketIO {
     }
 
     public Emitter emit(MessageType event, MessageJsonSocket message){
-        addInHistory(event, message);
         return socket.emit(event.getEvent(), encrypt(message));
     }
 
     public Emitter emitAck(MessageType event, MessageJsonSocket message, Ack ack){
-        addInHistory(event, message);
         return socket.emit(event.getEvent(), encrypt(message), ack);
     }
 
@@ -69,9 +68,5 @@ public class SocketIO {
         if (securityConnection.isComplete())
             return securityConnection.encryptMessage(message.createJSON().toString());
         return message.createJSON().toString();
-    }
-
-    private void addInHistory(MessageType event, MessageJsonSocket message){
-        history.add(event, message);
     }
 }

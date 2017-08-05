@@ -15,7 +15,7 @@ public abstract class MessageJsonSocket {
 
     private final DateFormat format = new SimpleDateFormat("dd/MM:yyyy HH:mm:ss");
 
-    public abstract JSONObject createJSON();
+    public abstract String createJSON();
 
     public void setContext(String context){
         this.context = context;

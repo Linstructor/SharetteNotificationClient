@@ -19,7 +19,7 @@ public class History {
     }
 
     private History() {
-        //TODO find log file
+        //TODO create log file and archive the older
     }
 
     public void add(MessageType type, MessageJsonSocket message){

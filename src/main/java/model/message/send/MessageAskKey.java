@@ -1,18 +1,23 @@
 package model.message.send;
 
 import model.message.MessageJsonSocket;
+import org.json.JSONException;
 import org.json.JSONObject;
-import sun.misc.OSEnvironment;
-
-import java.time.LocalDateTime;
-import java.util.Date;
 
 public class MessageAskKey extends MessageJsonSocket {
 
+    private String userId = "abcdefg";
     
 
     @Override
-    public JSONObject createJSON() {
-        return null;
+    public String createJSON() {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("userid", userId);
+            return jsonObject.toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 }

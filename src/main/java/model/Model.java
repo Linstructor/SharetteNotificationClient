@@ -1,18 +1,23 @@
 package model;
 
+import io.socket.client.Ack;
 import io.socket.emitter.Emitter;
 import model.connection.SocketIO;
 import model.message.MessageFactory;
 import model.message.MessageType;
+import model.message.get.MessageNotifReceiv;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Model {
+import java.util.Observable;
+
+public class Model extends Observable {
 
     private History history;
     private SocketIO socket;
 
     public Model() {
+        history = History.getInstance();
         initConnection();
     }
 
@@ -26,8 +31,8 @@ public class Model {
 
     public void addNewNotif(MessageType event, String notif){
         try {
-            JSONObject jsonObject = new JSONObject(notif);
-            history.add(event, MessageFactory.NOTIF_RECEIV.createMessage(jsonObject));
+            MessageNotifReceiv MessageNotif = (MessageNotifReceiv) MessageFactory.NOTIF_RECEIV.createMessage(new JSONObject(notif));
+            history.add(event, MessageNotif);
         } catch (JSONException e) {
             e.printStackTrace();
         }
