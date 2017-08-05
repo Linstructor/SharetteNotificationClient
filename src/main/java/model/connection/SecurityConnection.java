@@ -1,4 +1,4 @@
-package controler.connection;
+package model.connection;
 
 import io.socket.emitter.Emitter;
 import model.message.send.MessageAskKey;
@@ -17,14 +17,14 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
-public class SecurityConnection {
+class SecurityConnection {
 
     private static PublicKey keyPubServ;
     private static SecretKey keySymetric;
 
 
 
-    public SecurityConnection() {
+    SecurityConnection() {
         try {
             KeyGenerator generator = KeyGenerator.getInstance("AES");
             generator.init(128);
@@ -35,7 +35,7 @@ public class SecurityConnection {
         }
     }
 
-    public void securiseSocket(SocketIO socket){
+    void securiseSocket(SocketIO socket){
         MessageAskKey keyAsk = new MessageAskKey();
         socket.emit(MessageType.KEY_ASK, keyAsk);
         socket.once(MessageType.KEY_RECEIVE.getEvent(), new Emitter.Listener() {
@@ -66,7 +66,7 @@ public class SecurityConnection {
         }
     }
 
-    public String encryptMessage(String message){
+    String encryptMessage(String message){
         try {
             Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
             cipher.init(Cipher.ENCRYPT_MODE, keyPubServ);
@@ -83,7 +83,7 @@ public class SecurityConnection {
         return "";
     }
 
-    public boolean isComplete(){
+    boolean isComplete(){
         return keySymetric != null && keyPubServ != null;
     }
 }

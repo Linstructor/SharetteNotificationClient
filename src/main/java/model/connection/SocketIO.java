@@ -1,4 +1,4 @@
-package controler.connection;
+package model.connection;
 
 import io.socket.client.Ack;
 import io.socket.client.IO;
@@ -9,8 +9,6 @@ import model.message.MessageJsonSocket;
 import model.message.MessageType;
 
 import java.net.URISyntaxException;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class SocketIO {
 
@@ -21,7 +19,7 @@ public class SocketIO {
 
     public static SocketIO getInstance() {
         if (instance == null){
-            throw new NullPointerException("Le serveur n'a pas été instancié");
+            throw new NullPointerException("Connection has not been instanciate");
         }
         return instance;
     }
@@ -30,7 +28,7 @@ public class SocketIO {
         IO.Options options = new IO.Options();
         options.reconnection = true;
         options.multiplex = true;
-        socket = IO.socket("http://localhost:8081", options);
+        socket = IO.socket("http://"+url+":"+port, options);
         socket.connect();
         securityConnection = new SecurityConnection();
         securityConnection.securiseSocket(this);

@@ -4,9 +4,7 @@ public enum  MessageType {
     KEY_ASK("key_ask", 1),
     KEY_RECEIVE("key_re", 2),
     KEY_SEND("key_se", 1),
-    NOTIF("notif", 2),
-    NOTIF_CALLBACK("notif_return", 0),
-    NOTIF_REPLY("notif_a", 1);
+    NOTIF("notif", 2);
 
     private String event;
 
