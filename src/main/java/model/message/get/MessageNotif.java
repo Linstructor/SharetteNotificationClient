@@ -1,17 +1,30 @@
 package model.message.get;
 
 import model.message.MessageJsonSocket;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public abstract class MessageNotif extends MessageJsonSocket{
 
     private String appSender;
-    private String contents;
+    private String content;
     private String image;
 
-    public MessageNotif(String appSender, String contents) {
+    public MessageNotif(JSONObject jsonObject) {
+        try {
+            this.appSender = jsonObject.getString("app");
+            this.content = jsonObject.getString("content");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
-        this.appSender = appSender;
-        this.contents = contents;
+    public String getSender(){
+        return appSender;
+    }
+
+    public String getContent(){
+        return content;
     }
 
     @Override

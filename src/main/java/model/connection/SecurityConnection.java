@@ -22,8 +22,6 @@ class SecurityConnection {
     private static PublicKey keyPubServ;
     private static SecretKey keySymetric;
 
-
-
     SecurityConnection() {
         try {
             KeyGenerator generator = KeyGenerator.getInstance("AES");
@@ -37,13 +35,17 @@ class SecurityConnection {
 
     void securiseSocket(SocketIO socket){
         MessageAskKey keyAsk = new MessageAskKey();
+        System.out.println("Asking public key");
         socket.emit(MessageType.KEY_ASK, keyAsk);
+        System.out.println("Waiting public key...");
         socket.once(MessageType.KEY_RECEIVE.getEvent(), new Emitter.Listener() {
             @Override
             public void call(Object... args) {
                 try {
+                    System.out.println("Public key reveived");
                     setSecureServKey(new JSONObject((String)args[0]));
-                    MessageSendKey keySend = new MessageSendKey();
+                    MessageSendKey keySend = new MessageSendKey(new String(Base64.getEncoder().encode(keySymetric.getEncoded())));
+                    System.out.println("Sending symetrical key");
                     socket.emit(MessageType.KEY_SEND, keySend);
                 } catch (JSONException e) {
                     e.printStackTrace();

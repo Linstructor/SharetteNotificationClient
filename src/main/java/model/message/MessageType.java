@@ -1,10 +1,15 @@
 package model.message;
 
+import model.message.get.MessageKeyReceiv;
+import model.message.get.MessageNotifReceiv;
+import model.message.send.MessageAskKey;
+import model.message.send.MessageSendKey;
+
 public enum  MessageType {
-    KEY_ASK("key_ask", 1),
-    KEY_RECEIVE("key_re", 2),
-    KEY_SEND("key_se", 1),
-    NOTIF("notif", 2);
+    KEY_ASK("key_ask", 1, MessageAskKey.class),
+    KEY_RECEIVE("key_re", 2, MessageKeyReceiv.class),
+    KEY_SEND("key_send", 1, MessageSendKey.class),
+    NOTIF("notif", 2, MessageNotifReceiv.class);
 
     private String event;
 
@@ -13,10 +18,12 @@ public enum  MessageType {
      * 2 message receive
      */
     private int cat;
+    private Class messageClass;
 
-    MessageType(String event, int category) {
+    MessageType(String event, int category, Class messageClass) {
         this.event = event;
         this.cat = category;
+        this.messageClass = messageClass;
     }
 
     public String getEvent(){
@@ -25,5 +32,9 @@ public enum  MessageType {
 
     public int getCategory(){
         return cat;
+    }
+
+    public Class getMessageClass(){
+        return messageClass;
     }
 }

@@ -7,7 +7,7 @@ public class MessageNotifReplyReceiv extends MessageNotif {
 
 
 
-    public MessageNotifReplyReceiv(String appSender, String contents) {
-        super(appSender, contents);
+    public MessageNotifReplyReceiv(JSONObject jsonObject) {
+        super(jsonObject);
     }
 }

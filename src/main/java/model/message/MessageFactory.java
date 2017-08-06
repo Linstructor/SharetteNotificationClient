@@ -10,15 +10,15 @@ import org.json.JSONObject;
 import java.util.function.Function;
 
 public enum MessageFactory {
-    KEY_RECEIV(json -> new MessageKeyReceiv()),
-    KEY_SEND(json -> new MessageSendKey()),
-    KEY_ASK(json -> new MessageAskKey()),
-    NOTIF_RECEIV(json -> new MessageNotifReceiv("a", "b"));
+    KEY_RECEIV(json -> new MessageKeyReceiv(), MessageType.KEY_RECEIVE),
+    NOTIF_RECEIV(json -> new MessageNotifReceiv(json), MessageType.NOTIF);
 
-    Function<JSONObject,MessageJsonSocket> creator;
+    private Function<JSONObject,MessageJsonSocket> creator;
+    private MessageType event;
 
-    MessageFactory(Function<JSONObject, MessageJsonSocket> creator){
+    MessageFactory(Function<JSONObject, MessageJsonSocket> creator, MessageType event){
         this.creator = creator;
+        this.event = event;
     }
 
     public MessageJsonSocket createMessage(JSONObject json){

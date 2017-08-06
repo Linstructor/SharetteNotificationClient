@@ -13,10 +13,14 @@ public class Controler {
         this.model = model;
         this.view = view;
         model.addObserver(view);
+        listenNotif();
+    }
 
+    private void listenNotif(){
         model.listenSocket(MessageType.NOTIF, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
+                System.out.println("Notif received");
                 model.addNewNotif(MessageType.NOTIF, (String)args[0]);
             }
         });

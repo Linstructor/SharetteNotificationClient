@@ -17,7 +17,7 @@ public class MessageAskKey extends MessageJsonSocket {
             return jsonObject.toString();
         } catch (JSONException e) {
             e.printStackTrace();
-            return "";
+            return null;
         }
     }
 }

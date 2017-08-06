@@ -18,7 +18,7 @@ public class SocketIO {
     private static SocketIO instance = null;
     private SecurityConnection securityConnection;
 
-    public static SocketIO getInstance() {
+    static SocketIO getInstance() {
         if (instance == null){
             throw new NullPointerException("Connection has not been instanciate");
         }
@@ -27,7 +27,6 @@ public class SocketIO {
 
     private SocketIO(String url, int port) throws URISyntaxException {
         IO.Options options = new IO.Options();
-        options.reconnection = true;
         options.multiplex = true;
         socket = IO.socket("http://"+url+":"+port, options);
         socket.connect();
@@ -66,7 +65,7 @@ public class SocketIO {
 
     private String encrypt(MessageJsonSocket message){
         if (securityConnection.isComplete())
-            return securityConnection.encryptMessage(message.createJSON().toString());
-        return message.createJSON().toString();
+            return securityConnection.encryptMessage(message.createJSON());
+        return message.createJSON();
     }
 }

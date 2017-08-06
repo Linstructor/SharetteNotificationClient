@@ -31,8 +31,11 @@ public class Model extends Observable {
 
     public void addNewNotif(MessageType event, String notif){
         try {
-            MessageNotifReceiv MessageNotif = (MessageNotifReceiv) MessageFactory.NOTIF_RECEIV.createMessage(new JSONObject(notif));
-            history.add(event, MessageNotif);
+            MessageNotifReceiv messageNotif = (MessageNotifReceiv) MessageFactory.NOTIF_RECEIV.createMessage(new JSONObject(notif));
+            ObserverMessage observerMessage = new ObserverMessage(messageNotif, MessageType.NOTIF);
+            setChanged();
+            notifyObservers(observerMessage);
+            history.add(event, messageNotif);
         } catch (JSONException e) {
             e.printStackTrace();
         }
