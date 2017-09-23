@@ -14,18 +14,21 @@ public abstract class MessageNotif extends MessageJsonSocket{
         try {
             this.appSender = jsonObject.getString("app");
             this.content = jsonObject.getString("content");
+            this.image = jsonObject.getString("image");
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
     public String getSender(){
-        return appSender;
+        return appSender.replaceAll(" ", "_");
     }
 
     public String getContent(){
-        return content;
+        return content.replaceAll(" ", "_");
     }
+
+    public String getImage() { return image; }
 
     @Override
     public String createJSON() {

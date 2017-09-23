@@ -30,6 +30,7 @@ public class Model extends Observable {
     }
 
     public void addNewNotif(MessageType event, String notif){
+        notif = socket.decrypt(notif);
         try {
             MessageNotifReceiv messageNotif = (MessageNotifReceiv) MessageFactory.NOTIF_RECEIV.createMessage(new JSONObject(notif));
             ObserverMessage observerMessage = new ObserverMessage(messageNotif, MessageType.NOTIF);

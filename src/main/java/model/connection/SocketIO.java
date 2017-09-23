@@ -12,15 +12,13 @@ import java.net.URISyntaxException;
 
 public class SocketIO {
 
-    //TODO manage timeout
-
     private Socket socket;
     private static SocketIO instance = null;
     private SecurityConnection securityConnection;
 
     static SocketIO getInstance() {
         if (instance == null){
-            throw new NullPointerException("Connection has not been instanciate");
+            throw new NullPointerException("Connection has not been instantiate");
         }
         return instance;
     }
@@ -28,10 +26,18 @@ public class SocketIO {
     private SocketIO(String url, int port) throws URISyntaxException {
         IO.Options options = new IO.Options();
         options.multiplex = true;
+        options.reconnection = false;
+        options.timeout = 5000;
         socket = IO.socket("http://"+url+":"+port, options);
         socket.connect();
         securityConnection = new SecurityConnection();
         securityConnection.securiseSocket(this);
+        socket.on(Socket.EVENT_CONNECT_TIMEOUT, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                System.out.println("Timed out");
+            }
+        });
     }
 
     public static SocketIO connect(String url, int port){
@@ -55,6 +61,13 @@ public class SocketIO {
         return socket.emit(event.getEvent(), encrypt(message), ack);
     }
 
+    public Emitter emitNonSecure(MessageType event, MessageJsonSocket message){
+        if (message == null){
+            return socket.emit(event.getEvent(), "");
+        }else
+            return socket.emit(event.getEvent(), message.createJSON());
+    }
+
     public Emitter once(String event, Emitter.Listener fn) {
         return socket.once(event, fn);
     }
@@ -63,9 +76,11 @@ public class SocketIO {
         return socket.off(event);
     }
 
-    private String encrypt(MessageJsonSocket message){
-        if (securityConnection.isComplete())
-            return securityConnection.encryptMessage(message.createJSON());
-        return message.createJSON();
+    private byte[] encrypt(MessageJsonSocket message){
+        return securityConnection.encryptMessage(message.createJSON());
+    }
+
+    public String decrypt(String message){
+        return securityConnection.decrypt(message);
     }
 }
