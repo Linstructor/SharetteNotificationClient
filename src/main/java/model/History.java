@@ -11,7 +11,7 @@ public class History {
 
     private Map<MessageType, MessageJsonSocket> sendMessageHistory = new LinkedHashMap<>();
     private Map<MessageType, MessageJsonSocket> receivMessageHistory = new LinkedHashMap<>();
-    private File log;
+    private File log_file;
     private static History instance = null;
 
     public static History getInstance(){
