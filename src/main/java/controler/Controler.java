@@ -12,7 +12,7 @@ public class Controler {
     public Controler(Model model, View view) {
         this.model = model;
         this.view = view;
-        model.addObserver(view);
+        model.addListener(view);
         listenNotif();
     }
 

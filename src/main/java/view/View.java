@@ -1,5 +1,6 @@
 package view;
 
+import model.ModelListener;
 import model.ObserverMessage;
 
 import javax.imageio.ImageIO;
@@ -11,15 +12,13 @@ import java.util.Base64;
 import java.util.Observable;
 import java.util.Observer;
 
-public class View implements Observer{
-    @Override
-    public void update(Observable observable, Object o) {
-        ObserverMessage message = (ObserverMessage)o;
-        File script = new File(this.getClass().getResource("/notify.sh").getFile());
-        BufferedImage image = null;
-        byte[] imageByte;
+public class View implements ModelListener {
 
+    public void update(ObserverMessage message) {
+        File script = new File(this.getClass().getResource("/notify.sh").getFile());
         try {
+            BufferedImage image = null;
+            byte[] imageByte;
             if (!message.getMessage().getImage().equals("null")){
                 imageByte = Base64.getDecoder().decode(message.getMessage().getImage());
                 ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
@@ -34,6 +33,9 @@ public class View implements Observer{
             e.printStackTrace();
             CommandExecutor.getInstance().exec("bash "+script.getAbsolutePath(), message.getMessage().getSender(), message.getMessage().getContent());
         }
+    }
+    private void decryptImage(){
+
     }
 
     //TODO system to create an systray icon

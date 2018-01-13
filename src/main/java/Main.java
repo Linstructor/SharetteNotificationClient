@@ -1,5 +1,6 @@
 import controler.Controler;
 import model.Model;
+import view.SystemTrayNotif;
 import view.View;
 
 import javax.management.NotificationBroadcasterSupport;
@@ -11,5 +12,10 @@ public class Main {
 //        Model model = new Model();
 //        View view = new View();
 //        Controler controler = new Controler(model, view);
+        try {
+            SystemTrayNotif notif = new SystemTrayNotif();
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
     }
 }
