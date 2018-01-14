@@ -1,4 +1,4 @@
-package util;
+package utils;
 
 import java.security.SecureRandom;
 import java.util.Locale;

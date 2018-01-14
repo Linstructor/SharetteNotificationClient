@@ -1,8 +1,7 @@
 package model;
 
-import model.message.MessageJsonSocket;
-import model.message.MessageType;
-import model.message.get.MessageNotifReceiv;
+import controler.message.MessageType;
+import controler.message.get.MessageNotifReceiv;
 
 public class ObserverMessage {
 

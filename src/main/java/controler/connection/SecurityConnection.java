@@ -1,10 +1,10 @@
-package model.connection;
+package controler.connection;
 
 import io.socket.client.Ack;
 import io.socket.emitter.Emitter;
-import model.message.MessageType;
-import model.message.send.MessageSendInfo;
-import model.message.send.MessageSendKey;
+import controler.message.MessageType;
+import controler.message.send.MessageSendInfo;
+import controler.message.send.MessageSendKey;
 import org.json.JSONException;
 import org.json.JSONObject;
 

@@ -1,8 +1,8 @@
-package model.message;
+package controler.message;
 
 
-import model.message.get.MessageKeyReceiv;
-import model.message.get.MessageNotifReceiv;
+import controler.message.get.MessageKeyReceiv;
+import controler.message.get.MessageNotifReceiv;
 import org.json.JSONObject;
 
 import java.util.function.Function;

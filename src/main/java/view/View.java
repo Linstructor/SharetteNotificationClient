@@ -9,8 +9,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
-import java.util.Observable;
-import java.util.Observer;
 
 public class View implements ModelListener {
 
@@ -26,19 +24,15 @@ public class View implements ModelListener {
                 bis.close();
                 File outputfile = new File("image.png");
                 ImageIO.write(image, "png", outputfile);
-                CommandExecutor.getInstance().exec("bash "+script.getAbsolutePath(), message.getMessage().getSender(), message.getMessage().getContent(), outputfile.getAbsolutePath());
+                //CommandExecutor.getInstance().exec("bash "+script.getAbsolutePath(), message.getMessage().getSender(), message.getMessage().getContent(), outputfile.getAbsolutePath());
             }
-            CommandExecutor.getInstance().exec("bash "+script.getAbsolutePath(), message.getMessage().getSender(), message.getMessage().getContent());
+            //CommandExecutor.getInstance().exec("bash "+script.getAbsolutePath(), message.getMessage().getSender(), message.getMessage().getContent());
         } catch (IOException e) {
             e.printStackTrace();
-            CommandExecutor.getInstance().exec("bash "+script.getAbsolutePath(), message.getMessage().getSender(), message.getMessage().getContent());
+            //CommandExecutor.getInstance().exec("bash "+script.getAbsolutePath(), message.getMessage().getSender(), message.getMessage().getContent());
         }
     }
     private void decryptImage(){
 
     }
-
-    //TODO system to create an systray icon
-    //TODO create command executor for notify-send ubuntu and windows10 notification OR create a full stack notification system
-
 }

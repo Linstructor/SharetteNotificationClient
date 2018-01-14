@@ -1,9 +1,9 @@
-package model.message;
+package controler.message;
 
-import model.message.get.MessageKeyReceiv;
-import model.message.get.MessageNotifReceiv;
-import model.message.send.MessageSendInfo;
-import model.message.send.MessageSendKey;
+import controler.message.get.MessageKeyReceiv;
+import controler.message.get.MessageNotifReceiv;
+import controler.message.send.MessageSendInfo;
+import controler.message.send.MessageSendKey;
 
 public enum  MessageType {
     KEY_ASK("key_ask", 1, null),

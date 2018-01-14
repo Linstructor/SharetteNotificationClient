@@ -1,6 +1,4 @@
-package model.message;
-
-import org.json.JSONObject;
+package controler.message;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

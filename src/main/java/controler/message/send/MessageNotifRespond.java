@@ -1,6 +1,6 @@
-package model.message.send;
+package controler.message.send;
 
-import model.message.MessageJsonSocket;
+import controler.message.MessageJsonSocket;
 
 public class MessageNotifRespond extends MessageJsonSocket {
 

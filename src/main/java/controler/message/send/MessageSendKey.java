@@ -1,6 +1,6 @@
-package model.message.send;
+package controler.message.send;
 
-import model.message.MessageJsonSocket;
+import controler.message.MessageJsonSocket;
 import org.json.JSONException;
 import org.json.JSONObject;
 

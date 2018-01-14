@@ -9,13 +9,8 @@ import java.net.MalformedURLException;
 
 public class Main {
     public static void main(String[] args) {
-//        Model model = new Model();
-//        View view = new View();
-//        Controler controler = new Controler(model, view);
-        try {
-            SystemTrayNotif notif = new SystemTrayNotif();
-        } catch (AWTException e) {
-            e.printStackTrace();
-        }
+        Model model = new Model();
+        View view = new View();
+        Controler controler = new Controler(model, view);
     }
 }

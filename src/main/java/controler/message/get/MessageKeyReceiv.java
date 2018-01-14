@@ -1,6 +1,6 @@
-package model.message.get;
+package controler.message.get;
 
-import model.message.MessageJsonSocket;
+import controler.message.MessageJsonSocket;
 
 public class MessageKeyReceiv extends MessageJsonSocket {
     @Override

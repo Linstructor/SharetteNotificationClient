@@ -1,6 +1,5 @@
-package model.message.get;
+package controler.message.get;
 
-import model.message.MessageJsonSocket;
 import org.json.JSONObject;
 
 public class MessageNotifReplyReceiv extends MessageNotif {
