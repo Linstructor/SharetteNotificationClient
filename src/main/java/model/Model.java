@@ -35,11 +35,13 @@ public class Model {
 
     }
 
-    private ConnectionState socketStatus = ConnectionState.DISCONNECT;
+    private ConnectionState connectionState = ConnectionState.DISCONNECT;
 
-    public void setSocketStatus(ConnectionState socketStatus) {
-        this.socketStatus = socketStatus;
-        connectionListeners.forEach(socketStatusListener -> socketStatusListener.stateChange(socketStatus));
+
+    public void setConnectionState(ConnectionState socketState) {
+        this.connectionState = socketState;
+        System.out.println("Connection state change: "+ socketState.toString());
+        connectionListeners.forEach(socketStatusListener -> socketStatusListener.stateChange(connectionState));
     }
 
     public void addNewNotif(MessageType event, String notif){

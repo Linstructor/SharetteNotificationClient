@@ -15,6 +15,7 @@ import java.util.Set;
 public class SocketIO {
 
     private Socket socket;
+    private boolean connected = false;
     private static SocketIO instance = new SocketIO();
     private SecurityConnection securityConnection;
 
@@ -34,6 +35,10 @@ public class SocketIO {
     private SocketIO() {
     }
 
+    public void stop(){
+        socket.disconnect();
+    }
+
     public void connect(String url, int port){
         IO.Options options = new IO.Options();
         options.multiplex = true;
@@ -41,41 +46,17 @@ public class SocketIO {
         options.timeout = 5000;
         try {
             socket = IO.socket("http://"+url+":"+port, options);
-            socket.on(Socket.EVENT_CONNECT_TIMEOUT, new Emitter.Listener() {
-                @Override
-                public void call(Object... args) {
-                    System.out.println("Timed out");
-                    stateListeners.forEach(listener -> listener.stateChange(ConnectionState.DISCONNECT));
-                }
-            });
-            socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
-                @Override
-                public void call(Object... objects) {
-                    System.out.println("Connected");
-                    stateListeners.forEach(listener -> listener.stateChange(ConnectionState.OK));
-                }
-            });
-            socket.on(Socket.EVENT_ERROR, new Emitter.Listener() {
-                @Override
-                public void call(Object... objects) {
-                    System.out.println("Error socket");
-                    stateListeners.forEach(listener -> listener.stateChange(ConnectionState.ERROR));
-                }
-            });
-            socket.on(Socket.EVENT_CONNECTING, new Emitter.Listener() {
-                @Override
-                public void call(Object... objects) {
-                    System.out.println("Connecting socket");
-                    stateListeners.forEach(listener -> listener.stateChange(ConnectionState.CONNECTING));
-                }
-            });
-
+            manageStateListener();
             socket.connect();
             securityConnection = new SecurityConnection();
             securityConnection.securiseSocket(this);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isConnected(){
+        return connected;
     }
 
     public Emitter on(String event, Emitter.Listener listener){
@@ -112,4 +93,58 @@ public class SocketIO {
     public String decrypt(String message){
         return securityConnection.decrypt(message);
     }
+
+    private void manageStateListener(){
+        socket.on(Socket.EVENT_CONNECT_TIMEOUT, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+//                System.out.println("Timed out");
+                stateListeners.forEach(listener -> listener.stateChange(ConnectionState.DISCONNECT));
+            }
+        });
+        socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+            @Override
+            public void call(Object... objects) {
+//                System.out.println("Connected");
+                stateListeners.forEach(listener -> listener.stateChange(ConnectionState.OK));
+                connected = true;
+            }
+        });
+        socket.on(Socket.EVENT_ERROR, new Emitter.Listener() {
+            @Override
+            public void call(Object... objects) {
+//                System.out.println("Error socket");
+                stateListeners.forEach(listener -> listener.stateChange(ConnectionState.DISCONNECT));
+            }
+        });
+        socket.on(Socket.EVENT_CONNECTING, new Emitter.Listener() {
+            @Override
+            public void call(Object... objects) {
+//                System.out.println("Connecting socket");
+                stateListeners.forEach(listener -> listener.stateChange(ConnectionState.CONNECTING));
+            }
+        });
+        socket.on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
+            @Override
+            public void call(Object... objects) {
+//                System.out.println("Connection erro socket");
+                stateListeners.forEach(listener -> listener.stateChange(ConnectionState.DISCONNECT));
+            }
+        });
+        socket.on(Socket.EVENT_RECONNECT, new Emitter.Listener() {
+            @Override
+            public void call(Object... objects) {
+//                System.out.println("Reconnect socket");
+                stateListeners.forEach(listener -> listener.stateChange(ConnectionState.CONNECTING));
+            }
+        });
+        socket.on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
+            @Override
+            public void call(Object... objects) {
+//                System.out.println("Disconnected socket");
+                stateListeners.forEach(listener -> listener.stateChange(ConnectionState.DISCONNECT));
+                connected = false;
+            }
+        });
+    };
 }

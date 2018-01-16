@@ -7,6 +7,7 @@ import controler.message.send.MessageSendInfo;
 import controler.message.send.MessageSendKey;
 import org.json.JSONException;
 import org.json.JSONObject;
+import utils.StringGenerator;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
@@ -20,15 +21,18 @@ class SecurityConnection {
     private static PublicKey keyPubServ;
     private static SecretKey keySymetric;
     private static boolean secure = false;
+    private static String ivString = new StringGenerator(16).nextString();
+//    private static byte[] iv = ivString.getBytes();
     private static byte[] iv = "azertyuiopqsdfgh".getBytes();
     private static IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
 
     SecurityConnection() {
+        System.out.println("ivString: "+ivString);
         try {
             KeyGenerator generator = KeyGenerator.getInstance("AES");
             generator.init(256);
             keySymetric = generator.generateKey();
-            System.out.println(new String(keySymetric.getEncoded()).length());
+            System.out.println("Key size: "+keySymetric.getEncoded().length*8);
             System.out.println("Sym key: "+new String(Base64.getEncoder().encode(keySymetric.getEncoded())));
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
@@ -46,13 +50,13 @@ class SecurityConnection {
                 try {
                     System.out.println("Public key reveived");
                     setSecureServKey(new JSONObject((String)args[0]));
-                    MessageSendKey keySend = new MessageSendKey(new String(Base64.getEncoder().encode(keySymetric.getEncoded())));
+                    MessageSendKey keySend = new MessageSendKey(new String(Base64.getEncoder().encode(keySymetric.getEncoded())), ivString);
                     System.out.println("Sending symetrical key");
                     socket.emitAck(MessageType.KEY_SEND, keySend, new Ack() {
                         @Override
                         public void call(Object... args) {
                             if (args[0].equals("ok")){
-                                System.out.println("KCA");
+//                                System.out.println("KCA");
                                 secure = true;
                                 System.out.println("Sending user information");
                                 socket.emit(MessageType.SEND_INFO, infoMsg);
@@ -73,7 +77,7 @@ class SecurityConnection {
         try {
             String key = keyPub.getString("key");
             key = key.replaceAll("(-+BEGIN PUBLIC KEY-+\\s?\\n|-+END PUBLIC KEY-+|\\n)","");
-            System.out.println("serv pub key: "+key);
+//            System.out.println("serv pub key: "+key);
             byte[] rsaKey = Base64.getDecoder().decode(key);
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(rsaKey);
             KeyFactory factory = KeyFactory.getInstance("RSA");
@@ -85,9 +89,9 @@ class SecurityConnection {
     private byte[] encryptSym(String message){
         try {
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, keySymetric);
+            cipher.init(Cipher.ENCRYPT_MODE, keySymetric, ivParameterSpec);
             return cipher.doFinal(message.getBytes());
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException | InvalidAlgorithmParameterException e) {
             e.printStackTrace();
         }
         return null;
@@ -103,8 +107,8 @@ class SecurityConnection {
         try {
             Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
             cipher.init(Cipher.ENCRYPT_MODE, keyPubServ);
-            System.out.println("message send: "+new String(bytes));
-            System.out.println("message crypt send: "+new String(Base64.getEncoder().encode(cipher.doFinal(bytes))));
+//            System.out.println("message send: "+new String(bytes));
+//            System.out.println("message crypt send: "+new String(Base64.getEncoder().encode(cipher.doFinal(bytes))));
             return cipher.doFinal(bytes);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
             e.printStackTrace();

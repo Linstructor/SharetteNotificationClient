@@ -5,35 +5,40 @@ import controler.connection.SocketStatusListener;
 import controler.message.MessageType;
 import model.Model;
 import utils.ConnectionState;
-import view.SystemTrayNotif;
-import view.View;
 
 public class Controler implements SocketStatusListener{
      private Model model;
-     private View view;
 
      private SocketIO socket;
+     private String ip = "192.168.0.39";
 
-    public Controler(Model model, View view) {
+    public Controler(Model model) {
         this.model = model;
-        this.view = view;
-        model.addNotifListener(view);
-        model.addConnectionListener(SystemTrayNotif.getInstance());
         initConnection();
         socket.on(MessageType.NOTIF.getEvent(), objects -> {
-            System.out.println("Notif received");
+//            System.out.println("Notif received");
             model.addNewNotif(MessageType.NOTIF, socket.decrypt((String)objects[0]));
         });
+    }
+
+    public void reconnect(){
+        if (socket.isConnected()){
+            socket.connect(ip,8081);
+        }
+    }
+
+    public void quit(){
+        socket.stop();
     }
 
     private void initConnection(){
         socket = SocketIO.getInstance();
         socket.addStateListener(this);
-        socket.connect("192.168.0.19",8081);
+        socket.connect(ip,8081);
     }
 
     @Override
     public void stateChange(ConnectionState newState) {
-        model.setSocketStatus(newState);
+        model.setConnectionState(newState);
     }
 }

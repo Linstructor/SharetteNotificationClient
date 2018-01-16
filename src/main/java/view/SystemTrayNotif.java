@@ -15,63 +15,43 @@ public class SystemTrayNotif implements SocketStatusListener {
         return systemTrayNotif;
     }
 
-    private TrayIcon trayIcon ;
-    private String OS = System.getProperty("os.name").toLowerCase();
+    private static TrayIcon trayIcon ;
     private PopupMenu popup = new PopupMenu();
+    private TrayActionListener listener;
+    public void setListener(TrayActionListener listener){
+        this.listener = listener;
+    }
 
     private SystemTrayNotif() {
+        System.out.println("SystemTrayNotif Création");
+        configurePopup();
+        trayIcon = new TrayIcon(new ImageIcon(ConnectionState.DISCONNECT.getImagePath()).getImage());
+        trayIcon.setImageAutoSize(true);
+        trayIcon.setPopupMenu(popup);
+        setStatus(ConnectionState.DISCONNECT);
+        SystemTray systray = SystemTray.getSystemTray();
+        try {
+            systray.add(trayIcon);
+        } catch (AWTException e) {
+            System.err.println("Erreur lors de l'ajout de la trayicon");
+            e.printStackTrace();
+        }
+    }
+
+    private void configurePopup() {
         MenuItem quit = new MenuItem("Quitter");
+        quit.addActionListener(arg -> listener.quit());
         MenuItem notifs = new MenuItem();
+        MenuItem connection = new MenuItem();
+        connection.addActionListener(arg -> listener.changeState(Boolean.getBoolean(connection.getActionCommand())));
         notifs.setActionCommand("notif_menuItem");
         notifs.setEnabled(false);
         notifs.setLabel("Aucune notification");
         popup.add(notifs);
         popup.addSeparator();
+        popup.add(connection);
+        popup.addSeparator();
         popup.add(quit);
-        trayIcon = new TrayIcon(new ImageIcon(ConnectionState.OK.getImagePath()).getImage());
-        trayIcon.setImageAutoSize(true);
-        trayIcon.setPopupMenu(popup);
-        setStatus(ConnectionState.DISCONNECT);
-        SystemTray systray = SystemTray.getSystemTray();
-        trayIcon.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                System.out.println("click "+e.getButton());
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-            }
-        });
-        try {
-            systray.add(trayIcon);
-        } catch (AWTException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
-    public void displayNotification(String title, String content, TrayIcon.MessageType type){
-        if (OS.contains("win")){
-            trayIcon.displayMessage(title,content, type);
-        }else{
-            System.out.println("Not created");
-            //TODO Create unix notification
-        }
-
     }
 
     private void setStatus(ConnectionState status, String message){
@@ -80,6 +60,7 @@ public class SystemTrayNotif implements SocketStatusListener {
     }
 
     private void setStatus(ConnectionState status){
+//        System.out.println("Set tray icon "+status.toString());
         trayIcon.setImage(new ImageIcon(status.getImagePath().getFile()).getImage());
         trayIcon.setToolTip(status.getDefaultMessage());
     }
@@ -87,6 +68,18 @@ public class SystemTrayNotif implements SocketStatusListener {
     @Override
     public void stateChange(ConnectionState newState) {
         setStatus(newState);
+        MenuItem connection = popup.getItem(2);
+        if (newState == ConnectionState.DISCONNECT){
+            connection.setEnabled(false);
+            connection.setLabel("Se reconnecter");
+            connection.setActionCommand("false");
+        }else if(newState == ConnectionState.OK){
+            connection.setEnabled(false);
+            connection.setActionCommand("true");
+            connection.setLabel("Se déconnecter");
+        }else{
+            connection.setEnabled(false);
+        }
     }
 }
 
